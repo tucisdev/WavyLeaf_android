@@ -1,11 +1,7 @@
-#Android generated
-bin
-gen
-lint.xml
-
-#Eclipse
-.project
-*.properties
-.classpath
-.settings
-.checkstyle
+.gradle
+local.properties
+.idea/workspace.xml
+.idea/libraries
+.DS_Store
+build
+.idea
