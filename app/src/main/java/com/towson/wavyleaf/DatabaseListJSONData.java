@@ -3,16 +3,12 @@ package com.towson.wavyleaf;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import static android.provider.BaseColumns._ID;
-import static com.towson.wavyleaf.DatabaseConstants.ITEM_NAME;
-import static com.towson.wavyleaf.DatabaseConstants.TABLE_NAME;
+import android.provider.BaseColumns;
 
 /**
  * This class is based off of PA4 from the Android Development class
  * Not sure if this is the same number in the class now, but you get the idea.
  */
-
 public class DatabaseListJSONData extends SQLiteOpenHelper
 {
     private static final String DATABASE_NAME = "points.db";
@@ -31,14 +27,15 @@ public class DatabaseListJSONData extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(
-                "CREATE TABLE " + TABLE_NAME +
-                        " (" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME + " TEXT NOT NULL);");
+                "CREATE TABLE " + DatabaseConstants.TABLE_NAME +
+                        " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DatabaseConstants.ITEM_NAME +
+                        " TEXT NOT NULL);");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DatabaseConstants.TABLE_NAME);
         onCreate(db);
     }
 

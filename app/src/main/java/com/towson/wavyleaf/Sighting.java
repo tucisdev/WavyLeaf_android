@@ -918,8 +918,8 @@ public class Sighting extends SherlockFragmentActivity
         {
             sighting.put(UploadData.ARG_USER_ID, sp.getString(Settings.KEY_USER_ID, "null"));
             sighting.put(UploadData.ARG_PERCENT, getSelectedToggleButton());
-            sighting.put(UploadData.ARG_AREAVALUE, getAreaText());
-            sighting.put(UploadData.ARG_AREATYPE, shortenAreaType());
+            sighting.put(UploadData.ARG_AREA_VALUE, getAreaText());
+            sighting.put(UploadData.ARG_AREA_TYPE, shortenAreaType());
             sighting.put(UploadData.ARG_LATITUDE, currentEditableLocation.getLatitude());
             sighting.put(UploadData.ARG_LONGITUDE, currentEditableLocation.getLongitude());
             sighting.put(UploadData.ARG_NOTES, notes.getText());
@@ -944,7 +944,7 @@ public class Sighting extends SherlockFragmentActivity
             Toast.makeText(getApplicationContext(), "Data not saved, try again", Toast.LENGTH_SHORT).show();
         }
 
-        new UploadData(this, UploadData.TASK_SUBMIT_POINT).execute(sighting);
+        new UploadData(this, UploadData.Task.SUBMIT_POINT).execute(sighting);
     }
 
     protected void takePicture()
@@ -959,12 +959,11 @@ public class Sighting extends SherlockFragmentActivity
         this.runOnUiThread(Timer_UI_Thread);
     }
 
+    // this method runs in the same thread as the UI
     private Runnable Timer_UI_Thread = new Runnable()
     {
         public void run()
         {
-
-            // This method runs in the same thread as the UI
             locationData = (LocationApplication) getApplication();
             currentEditableLocation = locationData.getLocation();
 
@@ -1006,7 +1005,6 @@ public class Sighting extends SherlockFragmentActivity
     // http://stackoverflow.com/a/4830846/1097170
     public byte[] encodeInBase64(Bitmap bm)
     {
-
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();

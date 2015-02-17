@@ -121,11 +121,11 @@ public class LoginContinued extends SherlockActivity
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
             json.put(UploadData.ARG_NAME, sp.getString(Settings.KEY_NAME, "null"));
-            json.put(UploadData.ARG_BIRTHYEAR, sp.getString(Settings.KEY_BIRTHYEAR, "null"));
+            json.put(UploadData.ARG_BIRTH_YEAR, sp.getString(Settings.KEY_BIRTHYEAR, "null"));
             json.put(UploadData.ARG_EDUCATION, education.getSelectedItem());
-            json.put(UploadData.ARG_OUTDOOREXPERIENCE, experience.getSelectedItem());
-            json.put(UploadData.ARG_GENERALPLANTID, confidence_plant.getSelectedItem());
-            json.put(UploadData.ARG_WAVYLEAFID, confidence_wavyleaf.getSelectedItem());
+            json.put(UploadData.ARG_OUTDOOR_EXPERIENCE, experience.getSelectedItem());
+            json.put(UploadData.ARG_GENERAL_PLANT_ID, confidence_plant.getSelectedItem());
+            json.put(UploadData.ARG_WAVYLEAF_ID, confidence_wavyleaf.getSelectedItem());
             json.put(UploadData.ARG_EMAIL, sp.getString(Settings.KEY_EMAIL, "null"));
         }
         catch (JSONException e)

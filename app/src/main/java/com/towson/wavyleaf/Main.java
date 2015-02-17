@@ -407,8 +407,8 @@ public class Main extends SherlockActivity implements OnClickListener
 
         // Read values from local storage
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int int_single = sp.getInt(Settings.KEY_SINGLETALLY, 0);
-        int int_trip = sp.getInt(Settings.KEY_TRIPTALLY, 0);
+        int int_single = sp.getInt(Settings.KEY_SINGLE_TALLY, 0);
+        int int_trip = sp.getInt(Settings.KEY_TRIP_TALLY, 0);
 
         // Cast ints to strings. This is a funny hack
         String string_single = int_single + "";

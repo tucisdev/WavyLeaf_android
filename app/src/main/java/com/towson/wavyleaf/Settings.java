@@ -22,10 +22,10 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
     public static final String KEY_CHECKBOX_VIBRATE = "preference_vibrate";
     public static final String KEY_EMAIL = "preference_email";
     public static final String KEY_NAME = "preference_name";
-    public static final String KEY_SINGLETALLY = "preference_singletally";
+    public static final String KEY_SINGLE_TALLY = "preference_singletally";
     public static final String KEY_SPLASH = PREFERENCE + "splash";
     public static final String KEY_THEME = PREFERENCE + "theme";
-    public static final String KEY_TRIPTALLY = "preference_triptally";
+    public static final String KEY_TRIP_TALLY = "preference_triptally";
 
     // Key for tally for only current trip
     public static final String KEY_TRIPTALLY_CURRENT = "preference_triptally_current";
@@ -121,8 +121,8 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
         // Instantiation
         Preference p_age = (Preference) findPreference(KEY_BIRTHYEAR);
         Preference p_name = (Preference) findPreference(KEY_NAME);
-        Preference p_tally_single = findPreference(KEY_SINGLETALLY);
-        Preference p_tally_trip = findPreference(KEY_TRIPTALLY);
+        Preference p_tally_single = findPreference(KEY_SINGLE_TALLY);
+        Preference p_tally_trip = findPreference(KEY_TRIP_TALLY);
         CheckBoxPreference cbp_vibrate = (CheckBoxPreference) findPreference(KEY_CHECKBOX_VIBRATE);
         CheckBoxPreference cbp_noise = (CheckBoxPreference) findPreference(KEY_CHECKBOX_NOISE);
         CheckBoxPreference cbp_splash = (CheckBoxPreference) findPreference(KEY_SPLASH);
@@ -130,8 +130,8 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
         // Read values
         String string_age = sp.getString(KEY_BIRTHYEAR, "null");
         String string_name = sp.getString(KEY_NAME, "null");
-        int int_tally_single = sp.getInt(KEY_SINGLETALLY, 0);
-        int int_tally_trip = sp.getInt(KEY_TRIPTALLY, 0);
+        int int_tally_single = sp.getInt(KEY_SINGLE_TALLY, 0);
+        int int_tally_trip = sp.getInt(KEY_TRIP_TALLY, 0);
         boolean boolean_vibrate = sp.getBoolean(KEY_CHECKBOX_VIBRATE, true);
         boolean boolean_noise = sp.getBoolean(KEY_CHECKBOX_NOISE, true);
         boolean boolean_splash = sp.getBoolean(KEY_SPLASH, true);
