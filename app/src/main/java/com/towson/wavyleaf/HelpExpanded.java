@@ -1,7 +1,5 @@
 package com.towson.wavyleaf;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -10,88 +8,95 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnChildClickListener;
-
 import com.actionbarsherlock.app.SherlockExpandableListActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class HelpExpanded extends SherlockExpandableListActivity implements OnChildClickListener {
+import java.util.ArrayList;
 
-	ArrayList<String> groupItem = new ArrayList<String>();
-	ArrayList<Object> childItem = new ArrayList<Object>();
-	
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		
-		ExpandableListView expandbleLis = getExpandableListView();
-		expandbleLis.setDividerHeight(0);
-		expandbleLis.setGroupIndicator(null);
-		expandbleLis.setClickable(true);
+public class HelpExpanded extends SherlockExpandableListActivity implements OnChildClickListener
+{
+    ArrayList<String> groupItem = new ArrayList<String>();
+    ArrayList<Object> childItem = new ArrayList<Object>();
 
-		setGroupData();
-		setChildGroupData();
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-		HelpAdapter mNewAdapter = new HelpAdapter(groupItem, childItem);
-		mNewAdapter.setInflater((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE), this);
-		getExpandableListView().setAdapter(mNewAdapter);
-		expandbleLis.setOnChildClickListener(this);
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-        case android.R.id.home:
-        		Intent mainIntent = new Intent(this, Main.class);
-        		mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        		startActivity(mainIntent);
-        		finish();
-        		return true;
+        ExpandableListView expandbleLis = getExpandableListView();
+        expandbleLis.setDividerHeight(0);
+        expandbleLis.setGroupIndicator(null);
+        expandbleLis.setClickable(true);
+
+        setGroupData();
+        setChildGroupData();
+
+        HelpAdapter mNewAdapter = new HelpAdapter(groupItem, childItem);
+        mNewAdapter.setInflater((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE), this);
+        getExpandableListView().setAdapter(mNewAdapter);
+        expandbleLis.setOnChildClickListener(this);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                Intent mainIntent = new Intent(this, Main.class);
+                mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(mainIntent);
+                finish();
+                return true;
         }
-		return super.onOptionsItemSelected(item);
-	}
+        return super.onOptionsItemSelected(item);
+    }
 
-	public void setGroupData() {
-		groupItem.add("How this works");
-		groupItem.add("Identification");
-		groupItem.add("FAQ");
-	}
-	
-	public void setChildGroupData() {
-		
-		Resources res = getResources();
-		
-		// How this works
-		ArrayList<String> child = new ArrayList<String>();
-		child.add(res.getString(R.string.layout_help_how_first) + "\n\n"
-				+ res.getString(R.string.layout_help_how_second) + "\n\n"
-				+ res.getString(R.string.layout_help_how_third));
-		childItem.add(child);
+    public void setGroupData()
+    {
+        groupItem.add("How this works");
+        groupItem.add("Identification");
+        groupItem.add("FAQ");
+    }
 
-		// Identification
+    public void setChildGroupData()
+    {
+
+        Resources res = getResources();
+
+        // How this works
+        ArrayList<String> child = new ArrayList<String>();
+        child.add(res.getString(R.string.layout_help_how_first) + "\n\n"
+                          + res.getString(R.string.layout_help_how_second) + "\n\n"
+                          + res.getString(R.string.layout_help_how_third));
+        childItem.add(child);
+
+        // Identification
         child = new ArrayList<String>();
         child.add(res.getString(R.string.layout_help_identify_first) + "\n\n"
-                + res.getString(R.string.layout_help_identify_second) + "\n\n"
-                + res.getString(R.string.layout_help_identify_third) + "\n\n"
-                + res.getString(R.string.layout_help_identify_fourth));
+                          + res.getString(R.string.layout_help_identify_second) + "\n\n"
+                          + res.getString(R.string.layout_help_identify_third) + "\n\n"
+                          + res.getString(R.string.layout_help_identify_fourth));
         childItem.add(child);
-		
-		// FAQ
-		child = new ArrayList<String>();
-		child.add(res.getString(R.string.layout_help_faq_first_question) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_first_answer) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_second_question) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_second_answer) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_third_question) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_third_answer) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_fourth_question) + "\n\n"
-				+ res.getString(R.string.layout_help_faq_fourth_answer));
-		childItem.add(child);
-	}
 
-	@Override
-	public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+        // FAQ
+        child = new ArrayList<String>();
+        child.add(res.getString(R.string.layout_help_faq_first_question) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_first_answer) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_second_question) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_second_answer) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_third_question) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_third_answer) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_fourth_question) + "\n\n"
+                          + res.getString(R.string.layout_help_faq_fourth_answer));
+        childItem.add(child);
+    }
+
+    @Override
+    public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id)
+    {
 //		Toast.makeText(HelpExpanded.this, "Clicked On Child", Toast.LENGTH_SHORT).show();
-		return true;
-	}
+        return true;
+    }
 }
