@@ -86,7 +86,7 @@ public class UploadActivity extends SherlockActivity
                 jobj = stringToJSON(result);
 
                 // Dirty work
-                new Upload(this, UploadData.TASK_SUBMIT_POINT).execute(jobj);
+                new Upload(this, UploadData.Task.SUBMIT_POINT).execute(jobj);
 
             }
         }
@@ -106,17 +106,20 @@ public class UploadActivity extends SherlockActivity
         return jo;
     }
 
+    /**
+     * TODO: This seems to re-implement almost all of {@link com.towson.wavyleaf.UploadData UploadData}
+     */
     public class Upload extends AsyncTask<JSONObject, Void, String>
     {
 
         private ProgressDialog pd;
         private Context c;
-        protected int task = 0;
+        protected UploadData.Task task;
 
-        public Upload(Context ctx, int which)
+        public Upload(Context ctx, UploadData.Task task)
         {
             this.c = ctx;
-            this.task = which;
+            this.task = task;
             this.pd = new ProgressDialog(c);
         }
 
@@ -132,11 +135,11 @@ public class UploadActivity extends SherlockActivity
 
             String result = "";
 
-            // Verify that we know which PHP script to submit to
-            if ((this.task == UploadData.TASK_SUBMIT_POINT) || (this.task == UploadData.TASK_SUBMIT_USER))
+            // verify that we know which PHP script to submit to
+            if (task != null)
             {
 
-                // Read in the JSONObject from the JSONObject array
+                // read in the JSONObject from the JSONObject array
                 if (jobj.length > 0)
                 {
                     final JSONObject json = jobj[0];
@@ -226,17 +229,22 @@ public class UploadActivity extends SherlockActivity
             }
         }
 
+        /**
+         * Get URL of where to send HTTP POST request
+         *
+         * @return HTTP POST URL
+         */
         protected String getHttpPost()
         {
-            if (this.task == UploadData.TASK_SUBMIT_USER)
+            switch (task)
             {
-                return UploadData.SUBMIT_USER;
+                case SUBMIT_POINT:
+                    return UploadData.SUBMIT_POINT_WITH_PICTURE;
+                case SUBMIT_USER:
+                    return UploadData.SUBMIT_USER;
+                default:
+                    return null;
             }
-            else if (this.task == UploadData.TASK_SUBMIT_POINT)
-            {
-                return UploadData.SUBMIT_POINT;
-            }
-            return null;
         }
 
         protected void deleteFirstEntry()

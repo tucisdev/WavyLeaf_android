@@ -251,7 +251,7 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
             case SUBMIT_POINT:
                 return SUBMIT_POINT_WITH_PICTURE;
             case SUBMIT_USER:
-                return this.SUBMIT_USER;
+                return UploadData.SUBMIT_USER;
             default:
                 return null;
         }

@@ -133,7 +133,7 @@ public class LoginContinued extends SherlockActivity
             e.printStackTrace();
         }
 
-        new UploadData(this, UploadData.TASK_SUBMIT_USER).execute(json);
+        new UploadData(this, UploadData.Task.SUBMIT_USER).execute(json);
     }
 
 }
