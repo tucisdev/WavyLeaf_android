@@ -28,7 +28,7 @@ import java.io.InputStreamReader;
 public class UploadData extends AsyncTask<JSONObject, Void, String>
 {
     // server constants
-    protected static final String SERVER_URL = "http://skappsrv.towson.edu/";
+    protected static final String SERVER_URL = "http://heron.towson.edu/";
     protected static final String SUBMIT_USER = "wavyleaf/submit_user.php";
     protected static final String SUBMIT_POINT = "wavyleaf/submit_point.php";
     protected static final String SUBMIT_POINT_WITH_PICTURE = "wavyleaf/submit_point_with_pic.php";
