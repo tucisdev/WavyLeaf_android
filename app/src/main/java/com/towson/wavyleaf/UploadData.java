@@ -3,10 +3,10 @@ package com.towson.wavyleaf;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -21,11 +21,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 
 /**
  * Async task to upload data
  */
-public class UploadData extends AsyncTask<JSONObject, Void, String>
+public class UploadData extends AsyncTask<JSONObject, String, Boolean>
 {
     // server constants
     protected static final String SERVER_URL = "http://heron.towson.edu/";
@@ -52,9 +53,35 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
     protected static final String ARG_WAVYLEAF_ID = "wavyleafid";
     protected static final String ARG_EMAIL = "email";
 
-    private DatabaseListJSONData m_dbListData;
+    private PointsDatabase pointsDB; // points database
     private Context context; // application context
     private Task task; // type of upload task being performed
+    private SharedPreferences sharedPreferences; // shared preferences
+    private SharedPreferences.Editor preferencesEditor; // shared preferences editor
+    private boolean reupload; // whether this is a reattempted upload(do not save to local storage, already there)
+
+    /**
+     * Initialize upload task
+     *
+     * @param context
+     *         appplication context
+     * @param task
+     *         type of upload task
+     * @param reupload
+     *         whether this is a reattempted upload
+     */
+    public UploadData(Context context, Task task, boolean reupload)
+    {
+        this.context = context;
+        this.task = task;
+        this.reupload = reupload;
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferencesEditor = sharedPreferences.edit();
+
+        // initialize database
+        pointsDB = new PointsDatabase(this.context);
+    }
 
     /**
      * Initialize upload task
@@ -66,8 +93,7 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
      */
     public UploadData(Context context, Task task)
     {
-        this.context = context;
-        this.task = task;
+        this(context, task, false);
     }
 
     protected void onPreExecute()
@@ -83,119 +109,135 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
      * @return result of upload task
      */
     @Override
-    protected String doInBackground(JSONObject... jsonObjects)
+    protected Boolean doInBackground(JSONObject... jsonObjects)
     {
-
-        String result = "";
+        boolean result = false;
 
         // verify that we know which PHP script to submit to
         if (task != null)
         {
-
-            // read in the JSONObject from the JSONObject array
+            // ensure we have something to upload
             if (jsonObjects.length > 0)
             {
-                final JSONObject json = jsonObjects[0];
-
-                // save point to local storage before sending
-                if (task == Task.SUBMIT_POINT)
+                Log.d("UploadData", "Uploading " + jsonObjects.length + " points...");
+                for (JSONObject json : jsonObjects)
                 {
-                    submitToLocalStorage(json.toString());
-                }
+                    result = false; // assume unsuccessful upload until proven otherwise
 
-                // create a new HttpClient and Post Header
-                HttpClient hc = new DefaultHttpClient();
-                HttpPost hp = new HttpPost(SERVER_URL + getHttpPost());
-
-                try
-                {
-                    StringEntity se = new StringEntity(json.toString(), "UTF-8");
-
-                    // set appropriate headers
-                    se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-                    hp.setHeader("Content-Type", "application/json");
-
-                    // set data to send
-                    hp.setEntity(se);
-
-                    // execute the post
-                    HttpResponse response = hc.execute(hp);
-
-                    // ensure server sent response
-                    if (response != null)
+                    // save point to local storage before sending
+                    if (!reupload && task == Task.SUBMIT_POINT)
                     {
-                        InputStream is = response.getEntity().getContent();
-                        BufferedReader fromServer = new BufferedReader(new InputStreamReader(is));
-                        StringBuilder sb = new StringBuilder();
-                        String line;
+                        submitToLocalStorage(json.toString());
+                    }
 
-                        // read response from server
-                        try
+                    // create a new HttpClient and Post Header
+                    HttpClient httpClient = new DefaultHttpClient();
+                    HttpPost httpPost = new HttpPost(SERVER_URL + getHttpPost());
+
+                    try
+                    {
+                        StringEntity stringEntity = new StringEntity(json.toString(), "UTF-8");
+
+                        // set appropriate headers
+                        stringEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+                        httpPost.setHeader("Content-Type", "application/json");
+
+                        // set data to send
+                        httpPost.setEntity(stringEntity);
+
+                        // execute the post
+                        HttpResponse httpResponse = httpClient.execute(httpPost);
+
+                        // ensure server sent response
+                        if (httpResponse != null)
                         {
-                            while ((line = fromServer.readLine()) != null)
-                            {
-                                sb.append(line + "\n");
-                            }
-                        }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
-                        }
-                        finally
-                        {
-                            // close stream
+                            InputStream is = httpResponse.getEntity().getContent();
+                            BufferedReader fromServer = new BufferedReader(new InputStreamReader(is));
+                            StringBuilder sb = new StringBuilder();
+                            String line;
+
+                            // read response from server
                             try
                             {
-                                fromServer.close();
+                                while ((line = fromServer.readLine()) != null)
+                                {
+                                    sb.append(line + "\n");
+                                }
                             }
                             catch (IOException e)
                             {
                                 e.printStackTrace();
                             }
-                        }
+                            finally
+                            {
+                                // close stream
+                                try
+                                {
+                                    fromServer.close();
+                                }
+                                catch (IOException e)
+                                {
+                                    e.printStackTrace();
+                                }
+                            }
 
-                        // form result string
-                        result = sb.toString();
+                            // form result string
+                            String response = sb.toString();
+                            publishProgress(response);
+                            Log.d("UploadData", "Response: " + response);
+
+                            // break out of loop early if cancelled
+                            if (isCancelled())
+                            {
+                                break;
+                            }
+
+                            // if we weren't cancelled, we can assume we are still successful
+                            result = true;
+                        }
                     }
-                }
-                catch (IllegalStateException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
+                    catch (IllegalStateException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    catch (UnknownHostException e)
+                    {
+                        Log.e("UploadData", "Unable to resolve host '" + SERVER_URL + "'!");
+                    }
+                    catch (IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
         else
         {
-            result = "ERROR: bad script destination";
+            result = false;
         }
 
         return result;
     }
 
     /**
-     * Verify success and perform cleanup after upload
+     * Perform per-upload cleanup when progress is made IE increment point counter and remove point if it was
+     * successfully submitted
      *
      * @param result
-     *         JSON-formatted result string
+     *         single data entry result
      */
     @Override
-    protected void onPostExecute(String result)
+    protected void onProgressUpdate(String... result)
     {
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.context);
-        Editor preferencesEditor = sp.edit();
-
         JSONObject jsonResult;
-        String resultSuccess = "", resultMessage = "";
+        boolean resultSuccess = false;
+        String resultMessage = "";
 
         // extract information from json result string
         try
         {
-            jsonResult = new JSONObject(result); // create json from result string
-            resultSuccess = jsonResult.getString(Flag.SUCCESS.toString()); // result success
+            jsonResult = new JSONObject(result[0]); // create json from result string
+            resultSuccess = jsonResult.getInt(Flag.SUCCESS.toString()) == 1; // result success
             resultMessage = jsonResult.getString(Flag.MESSAGE.toString()); // result message
         }
         catch (JSONException e)
@@ -204,7 +246,7 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
         }
 
         // data sent successfully
-        if (resultSuccess.equalsIgnoreCase("1") || resultSuccess.contains("1"))
+        if (resultSuccess)
         {
             // succeeded in submitting point to server, delete locally saved copy
             if (task == Task.SUBMIT_POINT)
@@ -214,13 +256,15 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
                 // if point submitted is part of a trip, increment trip tally
                 if ((context.getClass() + "").contains("Trip"))
                 {
-                    preferencesEditor.putInt(Settings.KEY_TRIP_TALLY, sp.getInt(Settings.KEY_TRIP_TALLY, 0) + 1);
+                    preferencesEditor
+                            .putInt(Settings.KEY_TRIP_TALLY, sharedPreferences.getInt(Settings.KEY_TRIP_TALLY, 0) + 1);
                 }
                 // if point submitted is single point, increment point tally
                 else if ((context.getClass() + "").contains("Report") ||
                         (context.getClass() + "").contains("Sighting"))
                 {
-                    preferencesEditor.putInt(Settings.KEY_SINGLE_TALLY, sp.getInt(Settings.KEY_SINGLE_TALLY, 0) + 1);
+                    preferencesEditor.putInt(Settings.KEY_SINGLE_TALLY,
+                                             sharedPreferences.getInt(Settings.KEY_SINGLE_TALLY, 0) + 1);
                 }
             }
             // save user ID to preferences
@@ -233,10 +277,22 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
             /// commit changes to preferences
             preferencesEditor.commit();
         }
-        // unsuccessful result, not submitted successfully
-//		else
-//			Toast.makeText(this.context, "Error submitting. Saved for later.", Toast.LENGTH_LONG).show();
+        else
+        {
+            cancel(true); // failed to upload, kill current task
+        }
+    }
 
+    /**
+     * Verify success and perform cleanup
+     *
+     * @param result
+     *         boolean indicated if all JSON objects were uploaded successfully
+     */
+    @Override
+    protected void onPostExecute(Boolean result)
+    {
+        pointsDB.close();
     }
 
     /**
@@ -262,9 +318,7 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
      */
     protected void submitToLocalStorage(String JSONString)
     {
-        // initialize database
-        m_dbListData = new DatabaseListJSONData(this.context);
-        SQLiteDatabase db = m_dbListData.getWritableDatabase();
+        SQLiteDatabase db = pointsDB.getWritableDatabase();
 
         // insert string
         ContentValues values = new ContentValues();
@@ -273,19 +327,11 @@ public class UploadData extends AsyncTask<JSONObject, Void, String>
     }
 
     /**
-     * Delete first(oldest?) entry in database
-     *
-     * TODO: Verify this is intended. Seems it could result in unreliable behavior
-     *
-     * For Example:
-     *  Submit point 1, not successful
-     *  Submit point 2, successful, deletes point 1 from db
-     *  Point 1 never submitted
+     * Delete first entry in database
      */
     protected void deleteFirstEntry()
     {
-        DatabaseListJSONData m_dbListData = new DatabaseListJSONData(this.context);
-        SQLiteDatabase db = m_dbListData.getWritableDatabase();
+        SQLiteDatabase db = pointsDB.getWritableDatabase();
 
         String deleteSQL = "delete from " + DatabaseConstants.TABLE_NAME +
                 " where " + DatabaseConstants._ID +

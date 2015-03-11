@@ -1,97 +1,125 @@
 package com.towson.wavyleaf;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.os.Handler;
+import android.os.Looper;
 import com.actionbarsherlock.app.SherlockActivity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
+/**
+ * Activity wrapper around uploading data
+ *
+ * This is required for having some context for sending progress/updates to the UI/user and is used as the intent for
+ * the notification reminder for trip points.
+ */
 public class UploadActivity extends SherlockActivity
 {
-    private boolean success = false;
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_uploadactivity);
 
-        if (!isDBEmpty())
-        {
-            uploadPoints();
-        }
-        finish();
-        Toast.makeText(getApplicationContext(), "Sightings uploaded", Toast.LENGTH_SHORT).show();
+        // upload any saved points
+        uploadPoints();
+
+        // TODO onpostexecute of task, toast
+        // Toast.makeText(getApplicationContext(), "Sightings uploaded", Toast.LENGTH_SHORT).show();
     }
 
-    // http://stackoverflow.com/questions/11251901/check-whether-database-is-empty
-    protected boolean isDBEmpty()
-    {
-        DatabaseListJSONData m_dbListData = new DatabaseListJSONData(this);
-        SQLiteDatabase db = m_dbListData.getWritableDatabase();
-
-        Cursor cur = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
-        if (cur.moveToFirst())
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-
+    /**
+     * Attempt to upload all locally saved points
+     */
     protected void uploadPoints()
     {
-        DatabaseListJSONData m_dbListData = new DatabaseListJSONData(this);
-        SQLiteDatabase db = m_dbListData.getWritableDatabase();
-        JSONObject jobj = null;
+        PointsDatabase pointsDatabase = new PointsDatabase(this);
+        SQLiteDatabase db = pointsDatabase.getWritableDatabase();
+        List<JSONObject> points = new LinkedList<JSONObject>();
 
         // I want to look at the entire database
-        Cursor c = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
 
-        if (c != null)
+        // ensure db was available
+        if (cursor != null)
         {
-
-            // Look at the first entry
-            c.moveToFirst();
-
-            while (c.moveToNext())
+            // get all saved points, if any
+            while (cursor.moveToNext())
             {
+                // get the point data
+                int dataColumn = cursor.getColumnIndex(DatabaseConstants.ITEM_NAME); // column to get from
+                String result = cursor.getString(dataColumn); // get point string(formatted as json)
+                points.add(stringToJSON(result)); // use as json
+            }
 
-                // Get the blob
+            // upload points if we found any
+            if (!points.isEmpty())
+            {
+                // create progress dialog to give user feedback
+                final ProgressDialog progressDialog = new ProgressDialog(this);
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL); // horizontal for progress bar
+                progressDialog.setCancelable(false); // stay on top until finished
+                progressDialog.setMax(points.size()); // max points is max progress
+                progressDialog.setMessage("Uploading points..."); // message
+                progressDialog.show(); // show it!
 
-                // This is very hacky, and very incorrect
-                int iRow = c.getColumnIndex(DatabaseConstants.TABLE_NAME) + 2;
-                String result = c.getString(iRow);
+                // save activity so we can ask it to go away once done uploading
+                final UploadActivity thisActivity = this;
 
-                // But it works
+                // upload points
+                new UploadData(this, UploadData.Task.SUBMIT_POINT, true)
+                {
+                    @Override
+                    protected void onProgressUpdate(String... progress)
+                    {
+                        super.onProgressUpdate(progress);
 
-                // Convert to json
-                jobj = stringToJSON(result);
+                        // update current progress
+                        progressDialog.incrementProgressBy(1);
+                    }
 
-                // Dirty work
-                new Upload(this, UploadData.Task.SUBMIT_POINT).execute(jobj);
+                    @Override
+                    protected void onPostExecute(Boolean result)
+                    {
+                        super.onPostExecute(result);
 
+                        // finally inform user of success
+                        progressDialog.setMessage(result ? "All points uploaded!" : "Upload failed! Trying later...");
+                        progressDialog.setCancelable(true); // allow it to be cancelled now
+
+                        // automatically dismiss progress dialog after delay and end activity
+                        (new Handler(Looper.getMainLooper())).postDelayed(new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                progressDialog.dismiss();
+                                thisActivity.finish();
+                            }
+                        }, 500);
+                    }
+                }.execute(points.toArray(new JSONObject[]{}));
             }
         }
+
+        // close connection to database
+        db.close();
     }
 
+    /**
+     * Convert a JSON formatted String to a JSON object
+     *
+     * @param s
+     *         JSON formatted String
+     *
+     * @return JSON object from String
+     */
     protected JSONObject stringToJSON(String s)
     {
         JSONObject jo = null;
@@ -105,162 +133,4 @@ public class UploadActivity extends SherlockActivity
         }
         return jo;
     }
-
-    /**
-     * TODO: This seems to re-implement almost all of {@link com.towson.wavyleaf.UploadData UploadData}
-     */
-    public class Upload extends AsyncTask<JSONObject, Void, String>
-    {
-
-        private ProgressDialog pd;
-        private Context c;
-        protected UploadData.Task task;
-
-        public Upload(Context ctx, UploadData.Task task)
-        {
-            this.c = ctx;
-            this.task = task;
-            this.pd = new ProgressDialog(c);
-        }
-
-        protected void onPreExecute()
-        {
-            this.pd.setMessage("Uploading...");
-            this.pd.show();
-        }
-
-        @Override
-        protected String doInBackground(JSONObject... jobj)
-        {
-
-            String result = "";
-
-            // verify that we know which PHP script to submit to
-            if (task != null)
-            {
-
-                // read in the JSONObject from the JSONObject array
-                if (jobj.length > 0)
-                {
-                    final JSONObject json = jobj[0];
-
-                    // Create a new HttpClient and Post Header
-                    HttpClient hc = new DefaultHttpClient();
-                    HttpPost hp = new HttpPost(UploadData.SERVER_URL + getHttpPost());
-
-                    try
-                    {
-                        StringEntity se = new StringEntity(json.toString(), "UTF-8");
-
-                        // Data to store
-                        hp.setEntity(se);
-
-                        // Execute the post
-                        HttpResponse response = hc.execute(hp);
-
-                        // For response
-                        if (response != null)
-                        {
-                            InputStream is = response.getEntity().getContent();
-                            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                            StringBuilder sb = new StringBuilder();
-                            String line = null;
-
-                            try
-                            {
-                                while ((line = reader.readLine()) != null)
-                                {
-                                    sb.append(line + "\n");
-                                }
-                            }
-                            catch (IOException e)
-                            {
-                                e.printStackTrace();
-                            }
-                            finally
-                            {
-                                try
-                                {
-                                    is.close();
-                                }
-                                catch (IOException e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            result = sb.toString();
-
-                            if (sb.toString().contains("1"))
-                            {
-                                success = true;
-                                deleteFirstEntry();
-                            }
-                            else
-                            {
-                                success = false;
-                            }
-                        }
-                    }
-                    catch (IllegalStateException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            else
-            {
-                result = "ERROR: bad script destination";
-            }
-
-            return result;
-        }
-
-        protected void onPostExecute(String s)
-        {
-            if (this.pd.isShowing())
-            {
-                this.pd.dismiss();
-            }
-        }
-
-        /**
-         * Get URL of where to send HTTP POST request
-         *
-         * @return HTTP POST URL
-         */
-        protected String getHttpPost()
-        {
-            switch (task)
-            {
-                case SUBMIT_POINT:
-                    return UploadData.SUBMIT_POINT_WITH_PICTURE;
-                case SUBMIT_USER:
-                    return UploadData.SUBMIT_USER;
-                default:
-                    return null;
-            }
-        }
-
-        protected void deleteFirstEntry()
-        {
-            DatabaseListJSONData m_dbListData = new DatabaseListJSONData(this.c);
-            SQLiteDatabase db = m_dbListData.getWritableDatabase();
-
-            String ALTER_TBL = "delete from " + DatabaseConstants.TABLE_NAME +
-                    " where " + DatabaseConstants._ID +
-                    " in (select " + DatabaseConstants._ID +
-                    " from " + DatabaseConstants.TABLE_NAME + " order by _id LIMIT 1);";
-
-            db.execSQL(ALTER_TBL);
-        }
-
-
-    }
-
 }

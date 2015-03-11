@@ -128,7 +128,9 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"
             android:label="Uploading Points"
-            android:theme="@style/Theme.greeeeeen" />
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.NoDisplay" />
 
         <receiver android:name="com.towson.wavyleaf.AlarmReceiver" />
 

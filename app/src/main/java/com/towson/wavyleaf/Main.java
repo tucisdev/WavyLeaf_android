@@ -266,7 +266,7 @@ public class Main extends SherlockActivity implements OnClickListener
     // http://stackoverflow.com/questions/11251901/check-whether-database-is-empty
     protected boolean isDBEmpty()
     {
-        DatabaseListJSONData m_dbListData = new DatabaseListJSONData(this);
+        PointsDatabase m_dbListData = new PointsDatabase(this);
         SQLiteDatabase db = m_dbListData.getWritableDatabase();
 
         Cursor cur = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);

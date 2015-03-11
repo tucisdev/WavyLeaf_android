@@ -6,23 +6,34 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
 /**
- * This class is based off of PA4 from the Android Development class
- * Not sure if this is the same number in the class now, but you get the idea.
+ * Local database of points
+ *
+ * Contains an ID and a JSON string
+ *
+ * TODO: switch local points data from JSON to be stored properly in SQL
  */
-public class DatabaseListJSONData extends SQLiteOpenHelper
+public class PointsDatabase extends SQLiteOpenHelper
 {
-    private static final String DATABASE_NAME = "points.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "points.db"; // (SQLite) database filename
+    private static final int DATABASE_VERSION = 1; // current database version
 
     /**
-     * Create a helper object for the points database
+     * Initialize points database
      */
-    public DatabaseListJSONData(Context ctx)
+    public PointsDatabase(Context ctx)
     {
         super(ctx, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    // TABLE_NAME comes from DatabaseConstants.java
+    /**
+     * Create the database table
+     *
+     * Current structure is:
+     * CREATE TABLE list_json (
+     *   _id INTEGER PRIMARY KEY AUTOINCREMENT,
+     *   item_name TEXT NOT NULL
+     * );
+     */
     @Override
     public void onCreate(SQLiteDatabase db)
     {
@@ -32,6 +43,11 @@ public class DatabaseListJSONData extends SQLiteOpenHelper
                         " TEXT NOT NULL);");
     }
 
+    /**
+     * Upgrade existing database to newer version
+     * <p/>
+     * TODO: Pull data out of old database before dropping it, then re-insert
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
