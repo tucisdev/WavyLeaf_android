@@ -13,6 +13,8 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.towson.wavyleaf.data.upload.UploadConstants;
+import com.towson.wavyleaf.data.upload.UploadUser;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -120,20 +122,21 @@ public class LoginContinued extends SherlockActivity
         {
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-            json.put(UploadData.ARG_NAME, sp.getString(Settings.KEY_NAME, "null"));
-            json.put(UploadData.ARG_BIRTH_YEAR, sp.getString(Settings.KEY_BIRTHYEAR, "null"));
-            json.put(UploadData.ARG_EDUCATION, education.getSelectedItem());
-            json.put(UploadData.ARG_OUTDOOR_EXPERIENCE, experience.getSelectedItem());
-            json.put(UploadData.ARG_GENERAL_PLANT_ID, confidence_plant.getSelectedItem());
-            json.put(UploadData.ARG_WAVYLEAF_ID, confidence_wavyleaf.getSelectedItem());
-            json.put(UploadData.ARG_EMAIL, sp.getString(Settings.KEY_EMAIL, "null"));
+            json.put(UploadConstants.ARG_NAME, sp.getString(Settings.KEY_NAME, "null"));
+            json.put(UploadConstants.ARG_BIRTH_YEAR, sp.getString(Settings.KEY_BIRTHYEAR, "null"));
+            json.put(UploadConstants.ARG_EDUCATION, education.getSelectedItem());
+            json.put(UploadConstants.ARG_OUTDOOR_EXPERIENCE, experience.getSelectedItem());
+            json.put(UploadConstants.ARG_GENERAL_PLANT_ID, confidence_plant.getSelectedItem());
+            json.put(UploadConstants.ARG_WAVYLEAF_ID, confidence_wavyleaf.getSelectedItem());
+            json.put(UploadConstants.ARG_EMAIL, sp.getString(Settings.KEY_EMAIL, "null"));
         }
         catch (JSONException e)
         {
             e.printStackTrace();
         }
 
-        new UploadData(this, UploadData.Task.SUBMIT_USER).execute(json);
+        // TODO fail/close if user is unable to be created
+        new UploadUser(this).execute(json);
     }
 
 }

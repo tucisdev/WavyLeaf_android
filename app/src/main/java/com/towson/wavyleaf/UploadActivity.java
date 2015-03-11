@@ -6,7 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.BaseColumns;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.towson.wavyleaf.data.Point;
+import com.towson.wavyleaf.data.PointsDatabase;
+import com.towson.wavyleaf.data.upload.UploadPoints;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,10 +45,10 @@ public class UploadActivity extends SherlockActivity
     {
         PointsDatabase pointsDatabase = new PointsDatabase(this);
         SQLiteDatabase db = pointsDatabase.getWritableDatabase();
-        List<JSONObject> points = new LinkedList<JSONObject>();
+        List<Point> points = new LinkedList<Point>();
 
         // I want to look at the entire database
-        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + PointsDatabase.TABLE_NAME, null);
 
         // ensure db was available
         if (cursor != null)
@@ -52,10 +56,14 @@ public class UploadActivity extends SherlockActivity
             // get all saved points, if any
             while (cursor.moveToNext())
             {
+                // get point ID
+                int idColumn = cursor.getColumnIndex(BaseColumns._ID); // column to get ID from
+                int id = cursor.getInt(idColumn);
+
                 // get the point data
-                int dataColumn = cursor.getColumnIndex(DatabaseConstants.ITEM_NAME); // column to get from
+                int dataColumn = cursor.getColumnIndex(PointsDatabase.ITEM_NAME); // column to get from
                 String result = cursor.getString(dataColumn); // get point string(formatted as json)
-                points.add(stringToJSON(result)); // use as json
+                points.add(new Point(id, stringToJSON(result))); // use as json
             }
 
             // upload points if we found any
@@ -73,7 +81,7 @@ public class UploadActivity extends SherlockActivity
                 final UploadActivity thisActivity = this;
 
                 // upload points
-                new UploadData(this, UploadData.Task.SUBMIT_POINT, true)
+                new UploadPoints(this, true)
                 {
                     @Override
                     protected void onProgressUpdate(String... progress)
@@ -104,7 +112,7 @@ public class UploadActivity extends SherlockActivity
                             }
                         }, 500);
                     }
-                }.execute(points.toArray(new JSONObject[]{}));
+                }.execute(points.toArray(new Point[]{}));
             }
         }
 

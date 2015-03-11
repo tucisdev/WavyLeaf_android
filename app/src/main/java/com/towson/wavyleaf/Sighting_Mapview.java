@@ -173,10 +173,10 @@ public class Sighting_Mapview extends SherlockFragmentActivity implements OnClic
 
     private void updateUILocation(Location location)
     {
-        // Move the camera to this point
+        // Move the camera to this pointJSON
         goToCurrentPosition(location);
 
-        // Set a marker at this point
+        // Set a marker at this pointJSON
         if (!mapHasMarker)
         {
             setCurrentPositionMarker(location);

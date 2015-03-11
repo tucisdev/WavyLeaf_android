@@ -26,6 +26,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
+import com.towson.wavyleaf.data.PointsDatabase;
 
 public class Main extends SherlockActivity implements OnClickListener
 {
@@ -269,7 +270,7 @@ public class Main extends SherlockActivity implements OnClickListener
         PointsDatabase m_dbListData = new PointsDatabase(this);
         SQLiteDatabase db = m_dbListData.getWritableDatabase();
 
-        Cursor cur = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        Cursor cur = db.rawQuery("SELECT * FROM " + PointsDatabase.TABLE_NAME, null);
         if (cur.moveToFirst())
         {
             db.close();

@@ -33,6 +33,10 @@ import com.google.android.gms.maps.GoogleMap.CancelableCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.towson.wavyleaf.data.Point;
+import com.towson.wavyleaf.data.PointsDatabase;
+import com.towson.wavyleaf.data.upload.UploadConstants;
+import com.towson.wavyleaf.data.upload.UploadPoints;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -916,26 +920,26 @@ public class Sighting extends SherlockFragmentActivity
 
         try
         {
-            sighting.put(UploadData.ARG_USER_ID, sp.getString(Settings.KEY_USER_ID, "null"));
-            sighting.put(UploadData.ARG_PERCENT, getSelectedToggleButton());
-            sighting.put(UploadData.ARG_AREA_VALUE, getAreaText());
-            sighting.put(UploadData.ARG_AREA_TYPE, shortenAreaType());
-            sighting.put(UploadData.ARG_LATITUDE, currentEditableLocation.getLatitude());
-            sighting.put(UploadData.ARG_LONGITUDE, currentEditableLocation.getLongitude());
-            sighting.put(UploadData.ARG_NOTES, notes.getText());
-            sighting.put(UploadData.ARG_DATE,
+            sighting.put(UploadConstants.ARG_USER_ID, sp.getString(Settings.KEY_USER_ID, "null"));
+            sighting.put(UploadConstants.ARG_PERCENT, getSelectedToggleButton());
+            sighting.put(UploadConstants.ARG_AREA_VALUE, getAreaText());
+            sighting.put(UploadConstants.ARG_AREA_TYPE, shortenAreaType());
+            sighting.put(UploadConstants.ARG_LATITUDE, currentEditableLocation.getLatitude());
+            sighting.put(UploadConstants.ARG_LONGITUDE, currentEditableLocation.getLongitude());
+            sighting.put(UploadConstants.ARG_NOTES, notes.getText());
+            sighting.put(UploadConstants.ARG_DATE,
                          now.year + "-" + (now.month + 1) + "-" + now.monthDay + " " + now.hour + ":" + now.minute +
                                  ":" + now.second);
-            sighting.put(UploadData.ARG_TREATMENT, sp_treatment.getSelectedItem().toString());
+            sighting.put(UploadConstants.ARG_TREATMENT, sp_treatment.getSelectedItem().toString());
 
             if (!_64BitEncoding.equals(""))
             { // Picture was taken
                 // Server should also check to see if this value is an empty string
-                sighting.put(UploadData.ARG_PICTURE, _64BitEncoding);
+                sighting.put(UploadConstants.ARG_PICTURE, _64BitEncoding);
             }
             else // No picture was taken
             {
-                sighting.put(UploadData.ARG_PICTURE, "null");
+                sighting.put(UploadConstants.ARG_PICTURE, "null");
             }
 
         }
@@ -944,7 +948,7 @@ public class Sighting extends SherlockFragmentActivity
             Toast.makeText(getApplicationContext(), "Data not saved, try again", Toast.LENGTH_SHORT).show();
         }
 
-        new UploadData(this, UploadData.Task.SUBMIT_POINT).execute(sighting);
+        new UploadPoints(this).execute(new Point(-1, sighting));
     }
 
     protected void takePicture()
@@ -991,7 +995,7 @@ public class Sighting extends SherlockFragmentActivity
         PointsDatabase m_dbListData = new PointsDatabase(this);
         SQLiteDatabase db = m_dbListData.getWritableDatabase();
 
-        Cursor cur = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        Cursor cur = db.rawQuery("SELECT * FROM " + PointsDatabase.TABLE_NAME, null);
         if (cur.moveToFirst())
         {
             return false;

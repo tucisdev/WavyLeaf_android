@@ -1,4 +1,4 @@
-package com.towson.wavyleaf;
+package com.towson.wavyleaf.data;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,8 +12,12 @@ import android.provider.BaseColumns;
  *
  * TODO: switch local points data from JSON to be stored properly in SQL
  */
-public class PointsDatabase extends SQLiteOpenHelper
+public class PointsDatabase extends SQLiteOpenHelper implements BaseColumns
 {
+    // database constants
+    public static final String TABLE_NAME = "list_json";
+    public static final String ITEM_NAME = "item_name";
+
     private static final String DATABASE_NAME = "points.db"; // (SQLite) database filename
     private static final int DATABASE_VERSION = 1; // current database version
 
@@ -38,8 +42,8 @@ public class PointsDatabase extends SQLiteOpenHelper
     public void onCreate(SQLiteDatabase db)
     {
         db.execSQL(
-                "CREATE TABLE " + DatabaseConstants.TABLE_NAME +
-                        " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + DatabaseConstants.ITEM_NAME +
+                "CREATE TABLE " + TABLE_NAME +
+                        " (" + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + ITEM_NAME +
                         " TEXT NOT NULL);");
     }
 
@@ -51,7 +55,7 @@ public class PointsDatabase extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + DatabaseConstants.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 

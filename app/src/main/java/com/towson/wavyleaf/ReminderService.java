@@ -12,6 +12,7 @@ import android.media.RingtoneManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
+import com.towson.wavyleaf.data.PointsDatabase;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -149,7 +150,7 @@ public class ReminderService extends Service
         PointsDatabase m_dbListData = new PointsDatabase(this);
         SQLiteDatabase db = m_dbListData.getWritableDatabase();
 
-        Cursor cur = db.rawQuery("SELECT * FROM " + DatabaseConstants.TABLE_NAME, null);
+        Cursor cur = db.rawQuery("SELECT * FROM " + PointsDatabase.TABLE_NAME, null);
         if (cur.moveToFirst())
         {
             return false;
