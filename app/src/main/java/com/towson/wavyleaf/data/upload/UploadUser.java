@@ -25,12 +25,8 @@ import java.net.UnknownHostException;
 /**
  * Async task to upload user
  */
-public class UploadUser extends AsyncTask<JSONObject, Void, String>
+public class UploadUser extends UploadData<JSONObject>
 {
-    private Context context; // application context
-    private SharedPreferences sharedPreferences; // shared preferences
-    private SharedPreferences.Editor preferencesEditor; // shared preferences editor
-
     /**
      * Initialize upload task
      *
@@ -39,115 +35,11 @@ public class UploadUser extends AsyncTask<JSONObject, Void, String>
      */
     public UploadUser(Context context)
     {
-        this.context = context;
-
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        preferencesEditor = sharedPreferences.edit();
+        super(context);
     }
 
-    protected void onPreExecute()
-    {
-    }
-
-    /**
-     * Perform upload of JSON data
-     *
-     * @param jsonObjects
-     *         JSON objects to upload
-     *
-     * @return result of upload task
-     */
     @Override
-    protected String doInBackground(JSONObject... jsonObjects)
-    {
-        String result = "";
-
-        // ensure we have something to upload
-        if (jsonObjects.length > 0)
-        {
-            JSONObject json = jsonObjects[0]; // we only upload 1 user at a time
-
-            // create a new HttpClient and Post Header
-            HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(UploadConstants.SERVER_URL + UploadConstants.SUBMIT_USER);
-
-            try
-            {
-                StringEntity stringEntity = new StringEntity(json.toString(), "UTF-8");
-
-                // set appropriate headers
-                stringEntity.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-                httpPost.setHeader("Content-Type", "application/json");
-
-                // set data to send
-                httpPost.setEntity(stringEntity);
-
-                // execute the post
-                HttpResponse httpResponse = httpClient.execute(httpPost);
-
-                // ensure server sent response
-                if (httpResponse != null)
-                {
-                    InputStream is = httpResponse.getEntity().getContent();
-                    BufferedReader fromServer = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder sb = new StringBuilder();
-                    String line;
-
-                    // read response from server
-                    try
-                    {
-                        while ((line = fromServer.readLine()) != null)
-                        {
-                            sb.append(line + "\n");
-                        }
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    finally
-                    {
-                        // close stream
-                        try
-                        {
-                            fromServer.close();
-                        }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // form result string
-                    result = sb.toString();
-                    Log.d("UploadData", "Response: " + result);
-                }
-            }
-            catch (IllegalStateException e)
-            {
-                e.printStackTrace();
-            }
-            catch (UnknownHostException e)
-            {
-                Log.e("UploadData", "Unable to resolve host '" + UploadConstants.SERVER_URL + "'!");
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Check for upload success and perform cleanup
-     *
-     * @param result
-     *         single data entry result
-     */
-    @Override
-    protected void onPostExecute(String result)
+    protected boolean submitSuccessful(String result)
     {
         JSONObject jsonResult;
 
@@ -176,5 +68,33 @@ public class UploadUser extends AsyncTask<JSONObject, Void, String>
             preferencesEditor.commit();
         }
         // FIXME failure state here means user is just never sent...
+
+        return resultSuccess;
+    }
+
+    @Override
+    protected String getPostPath()
+    {
+        return UploadConstants.SUBMIT_USER;
+    }
+
+    /**
+     * Perform upload of JSON data
+     *
+     * @param jsonObjects
+     *         JSON objects to upload
+     *
+     * @return result of upload task
+     */
+    @Override
+    protected Boolean doInBackground(JSONObject... jsonObjects)
+    {
+        // ensure we have a user to upload
+        if (jsonObjects.length == 1)
+        {
+            return uploadData(jsonObjects[0]);
+        }
+
+        return false;
     }
 }

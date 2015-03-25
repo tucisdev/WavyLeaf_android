@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.BaseColumns;
+import android.util.Log;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.towson.wavyleaf.data.Point;
 import com.towson.wavyleaf.data.PointsDatabase;
@@ -84,12 +85,12 @@ public class UploadActivity extends SherlockActivity
                 new UploadPoints(this, true)
                 {
                     @Override
-                    protected void onProgressUpdate(String... progress)
+                    protected void onProgressUpdate(Integer... progress)
                     {
                         super.onProgressUpdate(progress);
 
                         // update current progress
-                        progressDialog.incrementProgressBy(1);
+                        progressDialog.incrementProgressBy(progress.length == 1 ? progress[0] : 1);
                     }
 
                     @Override
@@ -98,7 +99,7 @@ public class UploadActivity extends SherlockActivity
                         super.onPostExecute(result);
 
                         // finally inform user of success
-                        progressDialog.setMessage(result ? "All points uploaded!" : "Upload failed! Trying later...");
+                        progressDialog.setMessage(result ? "All points uploaded!" : "Unable to reach server!\nTrying later...");
                         progressDialog.setCancelable(true); // allow it to be cancelled now
 
                         // automatically dismiss progress dialog after delay and end activity
@@ -110,7 +111,7 @@ public class UploadActivity extends SherlockActivity
                                 progressDialog.dismiss();
                                 thisActivity.finish();
                             }
-                        }, 500);
+                        }, 2500);
                     }
                 }.execute(points.toArray(new Point[]{}));
             }
