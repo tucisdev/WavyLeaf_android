@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.towson.wavyleaf"
-        minSdkVersion 15
-        targetSdkVersion 21
+        minSdkVersion 9
+        targetSdkVersion 18
         versionCode 9
         versionName "1.2"
     }
