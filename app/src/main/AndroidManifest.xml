@@ -17,7 +17,7 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.towson.wavyleaf.permission.MAPS_RECEIVE" />
-    <uses-permission android:name="edu.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
