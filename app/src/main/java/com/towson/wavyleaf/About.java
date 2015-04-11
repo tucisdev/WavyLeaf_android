@@ -37,4 +37,12 @@ public class About extends Activity
         }
     }
 
+    /**
+     * Close the about screen
+     * @param v view pressed
+     */
+    public void close(View v)
+    {
+        finish();
+    }
 }
