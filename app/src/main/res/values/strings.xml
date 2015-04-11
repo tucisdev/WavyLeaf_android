@@ -2,14 +2,14 @@
 <resources>
 
     <string name="app_name">Wavyleaf</string>
-    <string name="version">1.06g1</string>
-    <string name="website">http://skappsrv.towson.edu/wavyleaf/website/</string>
+    <string name="version">1.2</string>
+    <string name="website">http://heron.towson.edu/wavyleaf/home/</string>
     <string name="email">wavyleaf@towson.edu</string>
     <string-array name="email_array"><item>wavyleaf@towson.edu</item></string-array>
     <string name="towson_university">Towson University</string>
     
-    <string name="layout_about_authors">Eric Forbes / Mohsin Majid\n Jon Smoley / Jesse Day</string>
-    <string name="layout_about_supportedby">This project is partially supported by NSF DUE#1140781 and the School of Emerging Technologies at Towson University</string>
+    <string name="layout_about_authors">Eric Forbes / Mohsin Majid\nJon Smoley / Jesse Day\nJal Irani / Taylor Becker\n</string>
+    <string name="layout_about_supportedby">This project is partially supported by NSF DUE#1140781 and the School of Emerging Technologies at Towson University.</string>
     <string name="layout_about_developers">Developers</string>
     <string name="layout_about_specialthanks">Special Thanks</string>
     <string name="layout_about_thanksto">Dr. Kaza, Dr. Dehlinger, &amp; Dr. Beauchamp</string>
