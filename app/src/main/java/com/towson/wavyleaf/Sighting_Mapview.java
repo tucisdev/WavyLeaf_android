@@ -160,7 +160,7 @@ public class Sighting_Mapview extends SherlockFragmentActivity implements OnClic
     private void setUpMap()
     {
         updateMyLocation();
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mUiSettings = mMap.getUiSettings();
         mUiSettings.setMyLocationButtonEnabled(false);
         mUiSettings.setCompassEnabled(false);
@@ -226,7 +226,7 @@ public class Sighting_Mapview extends SherlockFragmentActivity implements OnClic
                 .target(new LatLng(location.getLatitude(), location.getLongitude()))
                 .zoom(18f) //arbitrary
                 .bearing(0)
-                .tilt(35) //arbitrary
+                .tilt(10) //arbitrary
                 .build();
         changeCamera(CameraUpdateFactory.newCameraPosition(userCurrentPosition));
     }
@@ -277,13 +277,25 @@ public class Sighting_Mapview extends SherlockFragmentActivity implements OnClic
                                 if (item == 0)
                                 {
                                     zoomLevel = mMap.getCameraPosition().zoom;
+                                    mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                                    changeCamera(CameraUpdateFactory.zoomTo(zoomLevel));
+                                }
+                                if (item == 1)
+                                {
+                                    zoomLevel = mMap.getCameraPosition().zoom;
                                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                                     changeCamera(CameraUpdateFactory.zoomTo(zoomLevel));
                                 }
-                                else if (item == 1)
+                                else if (item == 2)
                                 {
                                     zoomLevel = mMap.getCameraPosition().zoom;
                                     mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                                    changeCamera(CameraUpdateFactory.zoomTo(zoomLevel));
+                                }
+                                else if (item == 3)
+                                {
+                                    zoomLevel = mMap.getCameraPosition().zoom;
+                                    mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
                                     changeCamera(CameraUpdateFactory.zoomTo(zoomLevel));
                                 }
                             }

@@ -520,7 +520,7 @@ public class Sighting extends SherlockFragmentActivity
     private void setUpMap()
     {
         //updateMyLocation();
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         mUiSettings = mMap.getUiSettings();
         mUiSettings.setCompassEnabled(false);
         mUiSettings.setMyLocationButtonEnabled(false);
