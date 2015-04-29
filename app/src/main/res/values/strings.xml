@@ -94,7 +94,8 @@
     <string name="preference_other">OTHER</string>
     <string name="preference_sightings">SIGHTINGS</string>
     <string name="preference_user">USER</string>
-    
+
+    <string name="preference_user_id">User ID</string>
     <string name="preference_user_name">Name</string>
     <string name="preference_user_birthyear">Birth Year</string>
     <string name="preference_sightings_single">Single points submitted</string>

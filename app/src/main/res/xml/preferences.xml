@@ -2,10 +2,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="@string/preference_user" >
-        
+
         <Preference
-            android:key="preference_name"
-            android:title="@string/preference_user_name" />
+                android:key="preference_user_id"
+                android:title="@string/preference_user_id" />
+
+        <Preference
+                android:key="preference_name"
+                android:title="@string/preference_user_name" />
         
         <Preference
             android:key="preference_birthyear"

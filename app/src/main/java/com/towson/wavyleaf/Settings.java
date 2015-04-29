@@ -120,6 +120,7 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
 
         // Instantiation
         Preference p_age = (Preference) findPreference(KEY_BIRTHYEAR);
+        Preference p_id = (Preference) findPreference(KEY_USER_ID);
         Preference p_name = (Preference) findPreference(KEY_NAME);
         Preference p_tally_single = findPreference(KEY_SINGLE_TALLY);
         Preference p_tally_trip = findPreference(KEY_TRIP_TALLY);
@@ -130,6 +131,7 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
         // Read values
         String string_age = sp.getString(KEY_BIRTHYEAR, "null");
         String string_name = sp.getString(KEY_NAME, "null");
+        String string_user_id = sp.getString(KEY_USER_ID, "UNREGISTERED"); // should really be an int but it was saved as a string..
         int int_tally_single = sp.getInt(KEY_SINGLE_TALLY, 0);
         int int_tally_trip = sp.getInt(KEY_TRIP_TALLY, 0);
         boolean boolean_vibrate = sp.getBoolean(KEY_CHECKBOX_VIBRATE, true);
@@ -138,6 +140,7 @@ public class Settings extends SherlockPreferenceActivity implements OnSharedPref
 
         // Set Summaries
         p_name.setSummary(capitalizeFirstLetter(string_name));
+        p_id.setSummary(string_user_id);
         p_age.setSummary(capitalizeFirstLetter(string_age));
         p_tally_single.setSummary(int_tally_single + "");
         p_tally_trip.setSummary(int_tally_trip + "");
