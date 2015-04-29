@@ -11,6 +11,107 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:paddingTop="16dp" >
+        <!-- ================================================== Coordinates ================================================== -->
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF"
+                android:orientation="vertical" >
+
+            <TextView
+                    android:id="@+id/tv_coordinates"
+                    android:layout_width="match_parent"
+                    android:layout_height="24dp"
+                    android:background="#FFFFFF"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="@string/layout_sighting_coordinates" />
+
+            <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:background="#669900" />
+
+            <!--
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
+                android:textColor="#CC0000"
+                android:textStyle="italic"
+                android:textSize="14sp"
+                android:text="This may take a few moments" />
+                -->
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingLeft="4dp" >
+
+                <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical" >
+
+                    <TextView
+                            android:id="@+id/tv_latitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="6dp"
+                            android:paddingLeft="8dp"
+                            android:paddingTop="4dp"
+                            android:text="@string/latitude"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+
+                    <TextView
+                            android:id="@+id/tv_longitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingBottom="12dp"
+                            android:paddingLeft="8dp"
+                            android:paddingTop="6dp"
+                            android:text="@string/longitude"
+                            android:textColor="@android:color/black"
+                            android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <Button
+                        android:layout_width="32dp"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/edit_drawable"
+                        android:onClick="onEdit" />
+
+            </LinearLayout>
+
+            <fragment
+                    android:id="@+id/mapview_checkin"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="144dp" />
+
+            <CheckBox
+                    android:id="@+id/cb_confirm"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="@string/layout_sighting_confirmcoordinates" />
+
+        </LinearLayout>
+
+        <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/drop_shadow" />
 
 <!-- ================================================== Percentage Seen ================================================== -->
 
@@ -223,108 +324,6 @@
             android:layout_marginBottom="16dp"
             android:background="@drawable/drop_shadow" />
 
-<!-- ================================================== Coordinates ================================================== -->
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/tv_coordinates"
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:background="#FFFFFF"
-                android:gravity="center_vertical"
-                android:paddingLeft="8dp"
-                android:text="@string/layout_sighting_coordinates" />
-            
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:background="#669900" />
-            
-            <!--
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="24dp"
-                android:layout_marginLeft="8dp"
-                android:gravity="center_vertical"
-                android:textColor="#CC0000"
-                android:textStyle="italic"
-                android:textSize="14sp"
-                android:text="This may take a few moments" />
-                -->
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingLeft="4dp" >
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical" >
-
-                    <TextView
-                        android:id="@+id/tv_latitude"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="6dp"
-                        android:paddingLeft="8dp"
-                        android:paddingTop="4dp"
-                        android:text="@string/latitude"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tv_longitude"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingBottom="12dp"
-                        android:paddingLeft="8dp"
-                        android:paddingTop="6dp"
-                        android:text="@string/longitude"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-                    
-                </LinearLayout>
-
-                <Button
-                    android:layout_width="32dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="8dp"
-                    android:background="@drawable/edit_drawable"
-                    android:onClick="onEdit" />
-                
-            </LinearLayout>
-
-            <fragment
-                android:id="@+id/mapview_checkin"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="144dp" />
-            
-            <CheckBox
-                android:id="@+id/cb_confirm"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/layout_sighting_confirmcoordinates" />
-            
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/drop_shadow" />
-        
 <!-- ================================================== Treatment ================================================== -->
 
         <LinearLayout
@@ -460,7 +459,7 @@
             android:layout_height="3dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/drop_shadow" />
-        
+
     </LinearLayout>
 
 </ScrollView>
