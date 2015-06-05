@@ -2,6 +2,7 @@ package com.towson.wavyleaf;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -37,8 +38,10 @@ public class Login extends SherlockActivity
         setContentView(R.layout.layout_login);
         init();
 
-        // If a user has done this all already, proceed to main
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        // app preferences
+        final SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        // If a user has registered/logged in already, proceed to main
         if (!((sp.getBoolean(Settings.FIRST_RUN, true)) || (sp.getString(Settings.KEY_NAME, "null")) == "null"))
         {
             Intent mainIntent = new Intent(this, Main.class);
@@ -48,6 +51,44 @@ public class Login extends SherlockActivity
         }
         else
         {
+            // ensure user is confirmed to be over 18
+            if (!sp.getBoolean(Settings.KEY_OVER_18, false))
+            {
+                final Activity thisActivity = this;
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        switch (which)
+                        {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                Editor editor = sp.edit();
+                                editor.putBoolean(Settings.KEY_OVER_18, true);
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                AlertDialog.Builder builder = new AlertDialog.Builder(thisActivity);
+                                builder.setMessage(
+                                        "You must be over 18 to use this application! Wavyleaf will now close.")
+                                        .setCancelable(false)
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int id) {
+                                                thisActivity.finish();
+                                            }
+                                        }).show();
+
+                                break;
+                        }
+                    }
+                };
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Over 18?").setMessage("You must be over 18 to use this application. Please confirm your age.")
+                        .setPositiveButton("Over 18", dialogClickListener)
+                        .setNegativeButton("Under 18", dialogClickListener)
+                        .setCancelable(false).show();
+            }
+
             showDialog(EMAIL); // Calls onCreateDialog()
         }
     }
