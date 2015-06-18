@@ -70,7 +70,7 @@ public class Login extends SherlockActivity
                             case DialogInterface.BUTTON_NEGATIVE:
                                 AlertDialog.Builder builder = new AlertDialog.Builder(thisActivity);
                                 builder.setMessage(
-                                        "You must be over 18 to use this application! Wavyleaf will now close.")
+                                        "The Institutional Review Board at Towson University requires that participants in Project Wavyleaf be 18 years of age or older! Wavyleaf will now close.")
                                         .setCancelable(false)
                                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int id) {
@@ -83,7 +83,7 @@ public class Login extends SherlockActivity
                     }
                 };
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Over 18?").setMessage("You must be over 18 to use this application. Please confirm your age.")
+                builder.setTitle("Age Verification").setMessage("The Institutional Review Board at Towson University requires that participants in Project Wavyleaf be 18 years of age or older. If under 18 years old you can still assist in searching for wavyleaf but will need someone over 18 to submit the data using the app. Please confirm that you are 18 years of age or older.")
                         .setPositiveButton("Over 18", dialogClickListener)
                         .setNegativeButton("Under 18", dialogClickListener)
                         .setCancelable(false).show();
@@ -237,23 +237,29 @@ public class Login extends SherlockActivity
             }
         }
 
-        // Sometimes this gives us a null, so let's take that out
-        if (all.startsWith("null"))
+        // ensure there are accounts at all
+        if (all != null)
         {
-            all = all.substring(5, all.length());
+            // Sometimes this gives us a null, so let's take that out
+            if (all.startsWith("null"))
+            {
+                all = all.substring(5, all.length());
+            }
+
+            // We have a huge-ass string, so make it an array, then a list, then HashSet.
+            ArrayList<String> al = new ArrayList<String>(Arrays.asList(all.split(",")));
+            HashSet<String> h = new HashSet<String>(al);
+            al.clear();
+            al.addAll(h);
+
+            globalArray = new String[al.size()];
+            globalArray = al.toArray(globalArray);
+
+            return globalArray;
+            // Ya crybaby
         }
 
-        // We have a huge-ass string, so make it an array, then a list, then HashSet.
-        ArrayList<String> al = new ArrayList<String>(Arrays.asList(all.split(",")));
-        HashSet<String> h = new HashSet<String>(al);
-        al.clear();
-        al.addAll(h);
-
-        globalArray = new String[al.size()];
-        globalArray = al.toArray(globalArray);
-
-        return globalArray;
-        // Ya crybaby
+        return null;
     }
 
 }
