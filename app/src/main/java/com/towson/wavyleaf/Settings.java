@@ -16,27 +16,35 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class Settings extends SherlockPreferenceActivity implements OnSharedPreferenceChangeListener
 {
-    public static final String PREFERENCE = "preference_";
-    public static final String KEY_BIRTHYEAR = "preference_birthyear";
-    public static final String KEY_CHECKBOX_NOISE = "preference_noise";
-    public static final String KEY_CHECKBOX_VIBRATE = "preference_vibrate";
-    public static final String KEY_EMAIL = "preference_email";
-    public static final String KEY_NAME = "preference_name";
-    public static final String KEY_OVER_18 = "over_18";
-    public static final String KEY_SINGLE_TALLY = "preference_singletally";
-    public static final String KEY_SPLASH = PREFERENCE + "splash";
-    public static final String KEY_THEME = PREFERENCE + "theme";
-    public static final String KEY_TRIP_TALLY = "preference_triptally";
+    public static final String
+            PREFERENCE = "preference_",
+            KEY_CHECKBOX_NOISE = "preference_noise",
+            KEY_CHECKBOX_VIBRATE = "preference_vibrate",
+            KEY_OVER_18 = "over_18",
+            KEY_SINGLE_TALLY = "preference_singletally",
+            KEY_SPLASH = PREFERENCE + "splash",
+            KEY_THEME = PREFERENCE + "theme",
+            KEY_TRIP_TALLY = "preference_triptally",
+            KEY_UPLOAD_USER = "upload_user",
 
-    // Key for tally for only current trip
-    public static final String KEY_TRIPTALLY_CURRENT = "preference_triptally_current";
-    public static final String KEY_USER_ID = "preference_user_id";
+            // user info
+            KEY_BIRTHYEAR = "preference_birthyear",
+            KEY_CONFIDENCE_PLANT = "KEY_CONFIDENCE_PLANT",
+            KEY_CONFIDENCE_WAVYLEAF = "KEY_CONFIDENCE_WAVYLEAF",
+            KEY_EDUCATION = "KEY_EDUCATION",
+            KEY_EMAIL = "preference_email",
+            KEY_EXPERIENCE = "KEY_EXPERIENCE",
+            KEY_NAME = "preference_name",
 
-    public static final String TRIP_ENABLED_KEY = "trip_enabled";
-    public static final String TRIP_INTERVAL = "trip_interval";
-    public static final String TRIP_INTERVAL_MILLI = "trip_interval_milli";
-    public static final String FIRST_RUN = "first_run";
-    public static final String CURRENT_COUNTDOWN_SECOND = "current_countdown";
+            // Key for tally for only current trip
+            KEY_TRIPTALLY_CURRENT = "preference_triptally_current",
+            KEY_USER_ID = "preference_user_id",
+
+            TRIP_ENABLED_KEY = "trip_enabled",
+            TRIP_INTERVAL = "trip_interval",
+            TRIP_INTERVAL_MILLI = "trip_interval_milli",
+            FIRST_RUN = "first_run",
+            CURRENT_COUNTDOWN_SECOND = "current_countdown";
 
     public static final int DARK_THEME = R.style.Theme_Sherlock;
     public static final int LIGHT_THEME = R.style.Theme_Sherlock_Light;

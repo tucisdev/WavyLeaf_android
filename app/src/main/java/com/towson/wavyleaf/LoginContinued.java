@@ -53,7 +53,7 @@ public class LoginContinued extends SherlockActivity
                 return true;
             case R.id.menu_createaccount:
                 submit();
-                uploadData();
+                UploadUser.uploadUser(this);
                 Toast.makeText(getApplicationContext(), "Account Details Recorded", Toast.LENGTH_SHORT).show();
                 Intent mainIntent = new Intent(this, Main.class);
                 mainIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -108,35 +108,11 @@ public class LoginContinued extends SherlockActivity
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         Editor ed = sp.edit();
 
-        ed.putString("KEY_EDUCATION", education.getSelectedItem() + "");
-        ed.putString("KEY_EXPERIENCE", experience.getSelectedItem() + "");
-        ed.putString("KEY_CONFIDENCE_PLANT", confidence_plant.getSelectedItem() + "");
-        ed.putString("KEY_CONFIDENCE_WAVYLEAF", confidence_wavyleaf.getSelectedItem() + "");
+        ed.putString(Settings.KEY_EDUCATION, education.getSelectedItem() + "");
+        ed.putString(Settings.KEY_EXPERIENCE, experience.getSelectedItem() + "");
+        ed.putString(Settings.KEY_CONFIDENCE_PLANT, confidence_plant.getSelectedItem() + "");
+        ed.putString(Settings.KEY_CONFIDENCE_WAVYLEAF, confidence_wavyleaf.getSelectedItem() + "");
         ed.commit();
-    }
-
-    protected void uploadData()
-    {
-        JSONObject json = new JSONObject();
-        try
-        {
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
-            json.put(UploadConstants.ARG_NAME, sp.getString(Settings.KEY_NAME, "null"));
-            json.put(UploadConstants.ARG_BIRTH_YEAR, sp.getString(Settings.KEY_BIRTHYEAR, "null"));
-            json.put(UploadConstants.ARG_EDUCATION, education.getSelectedItem());
-            json.put(UploadConstants.ARG_OUTDOOR_EXPERIENCE, experience.getSelectedItem());
-            json.put(UploadConstants.ARG_GENERAL_PLANT_ID, confidence_plant.getSelectedItem());
-            json.put(UploadConstants.ARG_WAVYLEAF_ID, confidence_wavyleaf.getSelectedItem());
-            json.put(UploadConstants.ARG_EMAIL, sp.getString(Settings.KEY_EMAIL, "null"));
-        }
-        catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
-
-        // TODO fail/close if user is unable to be created
-        new UploadUser(this).execute(json);
     }
 
 }

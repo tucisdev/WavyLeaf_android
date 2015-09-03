@@ -920,7 +920,7 @@ public class Sighting extends SherlockFragmentActivity
 
         try
         {
-            sighting.put(UploadConstants.ARG_USER_ID, sp.getString(Settings.KEY_USER_ID, "null"));
+            sighting.put(UploadConstants.ARG_USER_ID, sp.getString(Settings.KEY_USER_ID, "Unknown"));
             sighting.put(UploadConstants.ARG_PERCENT, getSelectedToggleButton());
             sighting.put(UploadConstants.ARG_AREA_VALUE, getAreaText());
             sighting.put(UploadConstants.ARG_AREA_TYPE, shortenAreaType());

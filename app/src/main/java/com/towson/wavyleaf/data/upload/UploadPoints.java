@@ -10,12 +10,18 @@ import com.towson.wavyleaf.data.PointsDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ConcurrentModificationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 /**
  * Async task to upload points
  */
 public class UploadPoints extends UploadData<Point>
 {
     private PointsDatabase pointsDB; // points database
+    private UploadUser uploadUser; // upload user task to be executed before any points
     private boolean reupload; // whether this is a reattempted upload(do not save to local storage, already there)
 
     /**
@@ -31,6 +37,7 @@ public class UploadPoints extends UploadData<Point>
         super(context);
 
         this.reupload = reupload;
+        this.uploadUser = null;
 
         // initialize database
         pointsDB = new PointsDatabase(this.context);
@@ -121,12 +128,15 @@ public class UploadPoints extends UploadData<Point>
     @Override
     protected Boolean doInBackground(Point... points)
     {
+        String userID = null;
+
         // ensure we have something to upload
         if (points.length > 0)
         {
             Log.d("UploadData", "Uploading " + points.length + " points...");
             for (Point point : points)
             {
+
                 // save point to local storage before sending
                 if (!reupload)
                 {
@@ -134,13 +144,54 @@ public class UploadPoints extends UploadData<Point>
                     point = new Point((int) submitToLocalStorage(point.pointJSON.toString()), point.pointJSON);
                 }
 
+                // if we have a user to upload, do that
+                if (uploadUser != null)
+                {
+                    try
+                    {
+                        // wait for user to upload and grab user ID
+                        if (!uploadUser.get(1000, TimeUnit.MILLISECONDS) ||
+                                (userID = sharedPreferences.getString(Settings.KEY_USER_ID, "Unknown")).equals("Unknown"))
+                        {
+                            Log.e("UploadData", "Unable to upload user data before point upload!");
+                            return false;
+                        }
+                        uploadUser = null; // done with uploading
+
+                        // remove flag to upload user
+                        preferencesEditor.putBoolean(Settings.KEY_UPLOAD_USER, false);
+                        preferencesEditor.commit();
+                    }
+                    catch (Exception e)
+                    {
+                        Log.e("UploadData", "Unable to upload user data before point upload!");
+                        return false;
+                    }
+                }
+
+                // update user ID if we need to
+                if (userID != null)
+                {
+                    // update user ID in the point's JSON
+                    try
+                    {
+                        point.pointJSON.put(UploadConstants.ARG_USER_ID, userID);
+                    }
+                    catch (JSONException e)
+                    {
+                        Log.e("UploadData", "Unable to update User ID before upload!");
+                        return false;
+                    }
+                }
+
+
                 // upload point
                 boolean success = uploadData(point.pointJSON);
 
                 // upload failed, stop attempting to upload the rest of the points
                 if (!success)
                 {
-                    Log.d("UploadData", "Upload failed!");
+                    Log.e("UploadData", "Upload failed!");
                     return false;
                 }
 
@@ -152,6 +203,21 @@ public class UploadPoints extends UploadData<Point>
         }
 
         return true;
+    }
+
+    /**
+     * Check that we have a valid user to upload points from
+     *
+     * @see UploadUser#onPostExecute(Boolean)
+     */
+    @Override
+    protected void onPreExecute()
+    {
+        if (sharedPreferences.getBoolean(Settings.KEY_UPLOAD_USER, false))
+        {
+            Log.d("UploadData", "Re-attempting User Upload...");
+            uploadUser = UploadUser.uploadUser(context);
+        }
     }
 
     /**

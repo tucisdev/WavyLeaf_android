@@ -38,6 +38,38 @@ public class UploadUser extends UploadData<JSONObject>
         super(context);
     }
 
+    /**
+     * Form JSON object from user prefs and spawn task to upload user
+     *
+     * @param context context to perform upload under
+     */
+    public static UploadUser uploadUser(Context context)
+    {
+        // form JSON object with user data
+        JSONObject json = new JSONObject();
+        try
+        {
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+            json.put(UploadConstants.ARG_NAME, sp.getString(Settings.KEY_NAME, "Unknown"));
+            json.put(UploadConstants.ARG_BIRTH_YEAR, sp.getString(Settings.KEY_BIRTHYEAR, "Unknown"));
+            json.put(UploadConstants.ARG_EDUCATION, sp.getString(Settings.KEY_EDUCATION, "Unknown"));
+            json.put(UploadConstants.ARG_OUTDOOR_EXPERIENCE, sp.getString(Settings.KEY_EXPERIENCE, "Unknown"));
+            json.put(UploadConstants.ARG_GENERAL_PLANT_ID, sp.getString(Settings.KEY_CONFIDENCE_PLANT, "Unknown"));
+            json.put(UploadConstants.ARG_WAVYLEAF_ID, sp.getString(Settings.KEY_CONFIDENCE_WAVYLEAF, "Unknown"));
+            json.put(UploadConstants.ARG_EMAIL, sp.getString(Settings.KEY_EMAIL, "Unknown"));
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        // create and execute task
+        UploadUser uploadTask = new UploadUser(context);
+        uploadTask.execute(json);
+        return uploadTask;
+    }
+
     @Override
     protected boolean submitSuccessful(String result)
     {
@@ -67,7 +99,6 @@ public class UploadUser extends UploadData<JSONObject>
             /// commit changes to preferences
             preferencesEditor.commit();
         }
-        // FIXME failure state here means user is just never sent...
 
         return resultSuccess;
     }
@@ -96,5 +127,19 @@ public class UploadUser extends UploadData<JSONObject>
         }
 
         return false;
+    }
+
+    @Override
+    protected void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
+
+        // failed to upload user
+        if (!result)
+        {
+            // set flag so we know to try again later
+            Log.e("UploadData", "User failed to upload!");
+            preferencesEditor.putBoolean(Settings.KEY_UPLOAD_USER, true);
+            preferencesEditor.commit();
+        }
     }
 }
