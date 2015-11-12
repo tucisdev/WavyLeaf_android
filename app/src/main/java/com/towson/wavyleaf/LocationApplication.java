@@ -51,6 +51,14 @@ public class LocationApplication extends Application
             }
         };
 
+        start(); // start requesting updates from location manager
+    }
+
+    /**
+     * Start requesting updates from location manager
+     */
+    public void start()
+    {
         // Register the listener with the Location Manager to receive location updates
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, THIRTY_SECONDS, 0, locationListener);
@@ -58,6 +66,9 @@ public class LocationApplication extends Application
         isSearching = true;
     }
 
+    /**
+     * Stop location updates from location manager
+     */
     public void stop()
     {
         if (locationManager != null && locationListener != null)

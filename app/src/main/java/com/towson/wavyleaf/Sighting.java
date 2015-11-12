@@ -96,6 +96,7 @@ public class Sighting extends SherlockFragmentActivity
         // User edited coordinates, so don't get them again from gps
         if (!editedCoordinatesInOtherActivitySoDontGetGPSLocation)
         {
+            locationData.start();
             if (!isAccurateLocation(currentEditableLocation))
             {
                 refresh();
@@ -120,6 +121,14 @@ public class Sighting extends SherlockFragmentActivity
 //				}
 //			}			
         }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        locationData.stop();
     }
 
     protected void init()
