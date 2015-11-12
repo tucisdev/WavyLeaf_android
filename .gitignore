@@ -6,3 +6,5 @@ local.properties
 build
 .idea
 *.iml
+app/app-release.apk
+app/manifest-merger-release-report.txt
